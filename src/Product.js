@@ -5,6 +5,7 @@ const Product = () => {
     const [products, setProducts] = useState([]);
     const [newProductName, setNewProductName] = useState('');
     const [newProductPrice, setNewProductPrice] = useState('');
+    const [selectedProductId, setSelectedProductId] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:5000/products')
@@ -41,17 +42,28 @@ const Product = () => {
             });
     };
 
-    const handleUpdateProduct = (id, currentName, currentPrice) => {
-        const newName = prompt('Enter new name', currentName);
-        const newPrice = prompt('Enter new price', currentPrice);
+    const handleUpdateProduct = (id) => {
+        const newName = prompt('Enter new name');
+        const newPrice = prompt('Enter new price');
         
         if (newName !== null && newPrice !== null) {
             axios.put(`http://localhost:5000/products/${id}`, {
                 name: newName,
-                price: newPrice
+                price: parseFloat(newPrice)
             })
             .then(response => {
-                setProducts(response.data);
+                setProducts(prevProducts => {
+                    return prevProducts.map(product => {
+                        if (product._id === id) {
+                            return {
+                                ...product,
+                                name: newName,
+                                price: parseFloat(newPrice)
+                            };
+                        }
+                        return product;
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error updating product:', error);
@@ -67,7 +79,10 @@ const Product = () => {
                     <li key={product._id}>
                         {product.name} - ${product.price}
                         <button onClick={() => handleDeleteProduct(product._id)}>Delete</button>
-                        <button onClick={() => handleUpdateProduct(product._id, product.name, product.price)}>Update</button>
+                        <button onClick={() => {
+                            setSelectedProductId(product._id);
+                            handleUpdateProduct(product._id);
+                        }}>Update</button>
                     </li>
                 ))}
             </ul>
