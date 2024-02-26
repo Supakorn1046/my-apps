@@ -10,10 +10,13 @@ export default function Product(){
             console.error('Error fetching data:', error);
           })
     },[])
-    const productList=product.map(p=><li key={p.id}>{p.id} 
+   
+   
+   
+   const productList=product.map(p=><li key={p.id}   >{p.id} 
     {p.name} <img src={p.img}/> {p.price}</li>)
     return (<>
-        <ul>
+        <ul>   
             {productList}
         </ul>
     </>)
